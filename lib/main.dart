@@ -25,6 +25,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
   TextEditingController _TE1=TextEditingController();
   TextEditingController _TE2=TextEditingController();
   Set<String> selectedItems = Set<String>();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -38,61 +39,94 @@ class _SelectionScreenState extends State<SelectionScreen> {
         padding: EdgeInsets.all(
           20
         ),
-        child: Column(
-          children: [
-            SizedBox(height: 10,),
-           TextFormField(
-             controller: _TE1,
-             decoration: InputDecoration(
-               hintText: "Type here"
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 10,),
+             TextFormField(
+               validator: (value) {
+                 if (value == null || value.isEmpty) {
+                   return 'Please enter some text';
+                 }
+                 return null;
+               },
+               controller: _TE1,
+               decoration: InputDecoration(
+                 hintText: "Type here"
+               ),
              ),
-           ),
-            SizedBox(height: 10,),
-            TextFormField(
-              controller: _TE2,
-             decoration: InputDecoration(
-               hintText: "Type here"
-             ),
-           ), SizedBox(height: 10,),
+              SizedBox(height: 10,),
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                },
+                controller: _TE2,
+               decoration: InputDecoration(
+                 hintText: "Type here"
+               ),
+             ), SizedBox(height: 10,),
 
-            Container(
-              height: 50,
-              width: double.infinity,
-            //  color: Colors.green,
-              alignment: Alignment.topRight,
-              child: ElevatedButton(onPressed: () {
-                setState(() {
-                  items1.add(_TE1.text);
-                  items2.add(_TE2.text);
-                });
-              }, child: Text("Add")),
-            ),
-            SizedBox(height: 10,),
-            Expanded(flex: 3,child: Container(
-              child: ListView.builder(
-                  itemCount: items1.length,
-                itemBuilder:(context, index) {
-                return Card(
-                  color: Colors.amber.shade50,
-                  child: ListTile(
-                    leading:Container(
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                          color: Colors.lightGreenAccent,
-                          borderRadius: BorderRadius.circular(30)),
-                    ) ,
+              Container(
+                height: 50,
+                width: double.infinity,
+              //  color: Colors.green,
+                alignment: Alignment.topRight,
+                child: ElevatedButton(onPressed: () {  if(_formKey.currentState!.validate()){
+                 showDialog(context: context, builder: (context) {
+                  return AlertDialog(
+                     title: Text("Do you want to Add"),
+                     actions: [
+                       ElevatedButton(onPressed: (){
 
-                    title: Text("${items1[index]}"),
-                    subtitle: Text("${items1[index]}"),
-                    trailing: IconButton(onPressed: () {
-                      
-                    }, icon: Icon(Icons.arrow_circle_right_outlined)),
-                  ),
-                );
-              },),
-              )),
-          ],
+                           setState(() {
+                             items1.add(_TE1.text);
+                             items2.add(_TE2.text);
+                           });
+                           Navigator.pop(context);
+
+                   }, child: Text("Yes")),
+                       ElevatedButton(onPressed: (){
+Navigator.pop(context);
+                   }, child: Text("No")),
+                     ],
+                   );
+                 },);
+                }}, child: Text("Add")),
+              ),
+              SizedBox(height: 10,),
+              Expanded(flex: 3,child: Container(
+                child: ListView.builder(
+                    itemCount: items1.length,
+                  itemBuilder:(context, index) {
+                  return Card(
+                    color: Colors.amber.shade50,
+                    child: ListTile(
+                      leading:Container(
+                        height: 20,
+                        width: 20,
+                        decoration: BoxDecoration(
+                            color: Colors.lightGreenAccent,
+                            borderRadius: BorderRadius.circular(30)),
+                      ) ,
+
+                      title: Text("${items1[index]}"),
+                      subtitle: Text("${items1[index]}"),
+                      trailing: IconButton(onPressed: () {
+                        setState(() {
+                          items1.removeAt(index);
+                          items2.removeAt(index);
+                        });
+                      }, icon: Icon(Icons.arrow_circle_right_outlined)),
+                    ),
+                  );
+                },),
+                )),
+            ],
+          ),
         ),
       ),
 
